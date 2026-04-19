@@ -76,7 +76,7 @@ function Nav({
           value={locationFilter}
           onChange={(e) => onLocationChange(e.target.value)}
         />
-        <div className="nav-tech-pills">
+        <div className={`nav-tech-pills${isExpanded ? " is-open" : ""}`}>
           <span className="nav-sources-label">Tech</span>
           {TECH_STACKS.map((tech) => (
             <button

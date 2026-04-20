@@ -6,8 +6,12 @@ const stripHtml = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s{2,}/g, "
 
 const KNOWN_SOURCES = ["aws", "google", "here", "mastercard"];
 
-function sourceBadgeClass(level: string) {
-  return KNOWN_SOURCES.includes(level) ? `source-${level}` : "source-default";
+function cardClass(level: string) {
+  return KNOWN_SOURCES.includes(level) ? `card-${level}` : "card-default";
+}
+
+function badgeClass(level: string) {
+  return KNOWN_SOURCES.includes(level) ? `source-badge source-${level}` : "source-badge source-default";
 }
 
 function JobCard({ job }: { job: JobLog }) {
@@ -15,19 +19,16 @@ function JobCard({ job }: { job: JobLog }) {
 
   return (
     <>
-      <article className="job-card" onClick={() => setIsModalActive(true)}>
-        <div className="job-card-header">
-          <p className="job-title">{job.title}</p>
-          <span className={`source-badge ${sourceBadgeClass(job.level)}`}>
-            {job.level}
-          </span>
+      <article className={`job-card ${cardClass(job.level)}`} onClick={() => setIsModalActive(true)}>
+        <p className="job-title">{job.title}</p>
+        <div className="job-meta">
+          <span>{job.location}</span>
+          <span className="job-meta-sep">·</span>
+          <time>{new Date(job.postedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</time>
         </div>
-        <div className="job-card-body">
-          <p className="job-location">{job.location}</p>
-          <p className="job-message">{stripHtml(job.jobDescription || job.message)}</p>
-          <time className="job-date">
-            {new Date(job.postedAt).toDateString()}
-          </time>
+        <p className="job-message">{stripHtml(job.jobDescription || job.message)}</p>
+        <div className="job-footer">
+          <span className={badgeClass(job.level)}>{job.level}</span>
         </div>
       </article>
       <Modal

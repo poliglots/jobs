@@ -1,4 +1,3 @@
-import "bulma/css/bulma.min.css";
 import "./App.css";
 import data from "../../dist/jobs.json";
 import lastRun from "../../dist/time.json";
@@ -15,10 +14,26 @@ const deduped = data.filter((item) => {
   return true;
 });
 
+const locations = [...new Set(
+  deduped
+    .map((item) => item.location.split(",").at(-1)?.trim())
+    .filter(Boolean) as string[]
+)].sort();
+
 function App() {
-  const [filterBy, setFilterBy] = useState("");
-  const [locationFilter, setLocationFilter] = useState("");
+  const [sourceFilters, setSourceFilters] = useState<string[]>([]);
+  const [locationFilters, setLocationFilters] = useState<string[]>([]);
   const [techFilters, setTechFilters] = useState<string[]>([]);
+
+  const toggleSource = (src: string) =>
+    setSourceFilters((prev) =>
+      prev.includes(src) ? prev.filter((s) => s !== src) : [...prev, src]
+    );
+
+  const addLocation = (loc: string) =>
+    setLocationFilters((prev) => (prev.includes(loc) ? prev : [...prev, loc]));
+  const removeLocation = (loc: string) =>
+    setLocationFilters((prev) => prev.filter((l) => l !== loc));
 
   const toggleTech = (tech: string) =>
     setTechFilters((prev) =>
@@ -26,10 +41,10 @@ function App() {
     );
 
   const filtered = deduped
-    .sort((a, b) => b.postedAt.localeCompare(a.postedAt))
+    .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
     .filter((item) => {
-      if (filterBy && item.level.toLowerCase() !== filterBy.toLowerCase()) return false;
-      if (locationFilter && !item.location.toLowerCase().includes(locationFilter.toLowerCase())) return false;
+      if (sourceFilters.length > 0 && !sourceFilters.includes(item.level)) return false;
+      if (locationFilters.length > 0 && !locationFilters.some((l) => item.location.toLowerCase().includes(l.toLowerCase()))) return false;
       if (techFilters.length > 0) {
         const haystack = [
           item.title,
@@ -44,16 +59,20 @@ function App() {
     });
 
   return (
-    <div id="page">
+    <div id="layout">
       <Nav
         lastUpdate={lastRun.time.split("GMT")[0]}
-        onSourceChange={setFilterBy}
         sources={sources}
-        activeSource={filterBy}
-        locationFilter={locationFilter}
-        onLocationChange={setLocationFilter}
+        sourceFilters={sourceFilters}
+        onSourceToggle={toggleSource}
+        onSourceClear={() => setSourceFilters([])}
+        locationFilters={locationFilters}
+        onLocationAdd={addLocation}
+        onLocationRemove={removeLocation}
+        locationSuggestions={locations}
         techFilters={techFilters}
         onTechToggle={toggleTech}
+        onTechClear={() => setTechFilters([])}
       />
       <div id="main">
         {filtered.map((job, index) => (

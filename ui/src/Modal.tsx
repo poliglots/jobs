@@ -54,11 +54,10 @@ const Modal = ({ isActive, onClose, source, title, company, location, url, jobDe
   const sourceClass = KNOWN_SOURCES.includes(source) ? `source-${source}` : "source-default";
 
   return (
-    <div className="modal is-active">
-      <div className="modal-background" onClick={onClose} />
-      <div className="m-dialog">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className={`m-dialog ${sourceClass}`} onClick={(e) => e.stopPropagation()}>
 
-        <div className={`m-topbar ${sourceClass}`}>
+        <div className="m-topbar">
           <span className="m-source-label">{company}</span>
           <button className="m-close" aria-label="close" onClick={onClose}>✕</button>
         </div>
@@ -90,12 +89,7 @@ const Modal = ({ isActive, onClose, source, title, company, location, url, jobDe
         </div>
 
         <div className="m-footer">
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="m-cta"
-          >
+          <a href={url} target="_blank" rel="noopener noreferrer" className="m-cta">
             Apply →
           </a>
           <button className="m-dismiss" onClick={onClose}>Dismiss</button>

@@ -15,7 +15,7 @@ clearNcommit(){
 
 
 
-read -t 10 -p "Enter code to proceed (you have 10 seconds): " code
+read -t 10 -p "Enter code to proceed (within 10 seconds): " code
 if [ -z "$code" ]; then
     echo ""
     echo "No code entered within the time limit."

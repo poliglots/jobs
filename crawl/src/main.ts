@@ -207,14 +207,15 @@ async function crawlIcimsPage(startIndex: number): Promise<{ jobs: Job[]; hasMor
 
 async function crawlIcimsJobs() {
   const PAGE_SIZE = 20;
+  const MAX_PAGES = DEBUG_MODE ? 1 : 20;
   let startIndex = 0;
 
   try {
-    while (true) {
+    while (startIndex < MAX_PAGES * PAGE_SIZE) {
       const { jobs, hasMore } = await crawlIcimsPage(startIndex);
       console.log(`HERE page startindex=${startIndex}: ${jobs.length} jobs`);
       for (const job of jobs) logger.info("", job);
-      if (!hasMore || (DEBUG_MODE && startIndex === 0)) break;
+      if (!hasMore) break;
       startIndex += PAGE_SIZE;
     }
   } catch (error) {
